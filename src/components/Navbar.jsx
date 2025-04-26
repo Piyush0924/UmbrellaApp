@@ -9,7 +9,7 @@ export default function Navbar({ activeSection, setActiveSection }) {
       <div className="container mx-auto px-4">
         <div className="flex justify-between items-center h-16">
           <div className="flex-shrink-0">
-            <h1 className="text-xl font-bold text-gray-800">FoodCompare</h1>
+            <h1 className="text-xl font-bold text-gray-800">UmbrellaApp</h1>
           </div>
           <div className="flex space-x-4">
             <Button
