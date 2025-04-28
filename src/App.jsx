@@ -1,3 +1,4 @@
+// App.js
 "use client"
 
 import { useState } from "react"
@@ -6,15 +7,16 @@ import Navbar from "./components/Navbar"
 import FoodSection from "./components/FoodSection"
 import TransportSection from "./components/TransportSection"
 import { store } from "./lib/store"
+import Footer from "./components/Footer"
 
 export default function App() {
   const [activeSection, setActiveSection] = useState(null)
 
   return (
     <Provider store={store}>
-      <main className="min-h-screen bg-gray-50">
+      <main className="min-h-screen bg-gray-50 flex flex-col">
         <Navbar activeSection={activeSection} setActiveSection={setActiveSection} />
-        <div className="container mx-auto px-4 py-8">
+        <div className="container mx-auto px-4 py-8 flex-grow">
           {activeSection === "food" && <FoodSection />}
           {activeSection === "transport" && <TransportSection />}
           {!activeSection && (
@@ -26,6 +28,7 @@ export default function App() {
             </div>
           )}
         </div>
+        <Footer />
       </main>
     </Provider>
   )
