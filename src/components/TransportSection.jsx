@@ -1,519 +1,295 @@
-"use client"
+import React from "react";
+import styled from "styled-components";
 
-import { useState, useEffect } from "react"
-import { useDispatch, useSelector } from "react-redux"
-import { Clock, DollarSign, Car, Plane, Bus, Loader2, Star, X } from "lucide-react"
-import { Button } from "./ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "./ui/card"
-import { Input } from "./ui/input"
-import { Label } from "./ui/label"
-import { selectTransportType } from "../lib/features/Transport/transportSlice"
-
-const transportTypes = [
-  { id: "car", name: "Car", icon: Car },
-  { id: "taxi", name: "Taxi", icon: Bus },
-  { id: "plane", name: "Plane", icon: Plane },
-]
-
-const transportServices = [
+// Tickets and Categories Data
+const tickets = [
   {
-    id: "uber",
+    type: "Bus",
+    destination: "Mumbai to Pune",
+    price: "₹299",
+    time: "8:00 AM",
+    img: "https://picsum.photos/200?bus",
+  },
+  {
+    type: "Train",
+    destination: "Delhi to Agra",
+    price: "₹499",
+    time: "10:30 AM",
+    img: "https://picsum.photos/200?train",
+  },
+  {
+    type: "Flight",
+    destination: "Bangalore to Goa",
+    price: "₹3499",
+    time: "1:00 PM",
+    img: "https://picsum.photos/200?flight",
+  },
+];
+
+const categories = [
+  {
     name: "Uber",
-    logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/58/Uber_logo_2018.svg/2560px-Uber_logo_2018.svg.png",
-    apiEndpoint: "/api/uber",
-    features: [
-      "24/7 availability",
-      "Multiple car options",
-      "Live tracking",
-      "Cashless payment"
-    ],
-    options: [
-      {
-        name: "Uber Go",
-        price: "₹250",
-        rating: 4.5,
-        features: ["Economy", "4 seats", "AC"],
-        image: "https://images.unsplash.com/photo-1550355291-bbee04a92027?w=500"
-      },
-      {
-        name: "Uber Premier",
-        price: "₹350",
-        rating: 4.7,
-        features: ["Premium", "4 seats", "AC", "Leather seats"],
-        image: "https://images.unsplash.com/photo-1552519507-da3b142c6e3d?w=500"
-      },
-      {
-        name: "Uber XL",
-        price: "₹450",
-        rating: 4.6,
-        features: ["SUV", "6 seats", "AC", "Spacious"],
-        image: "https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?w=500"
-      }
-    ]
+    link: "https://www.uber.com",
+    img: "https://a.storyblok.com/f/284380/1453x817/ff880bf80b/kia_ev6_air_tile.png",
   },
   {
-    id: "ola",
     name: "Ola",
-    logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3a/Ola_Cabs_logo.svg/2560px-Ola_Cabs_logo.svg.png",
-    apiEndpoint: "/api/ola",
-    features: [
-      "Wide coverage",
-      "Multiple vehicle types",
-      "Real-time tracking",
-      "Multiple payment options"
-    ],
-    options: [
-      {
-        name: "Ola Mini",
-        price: "₹230",
-        rating: 4.3,
-        features: ["Economy", "4 seats", "AC"],
-        image: "https://images.unsplash.com/photo-1550355291-bbee04a92027?w=500"
-      },
-      {
-        name: "Ola Prime",
-        price: "₹330",
-        rating: 4.5,
-        features: ["Premium", "4 seats", "AC", "Leather seats"],
-        image: "https://images.unsplash.com/photo-1552519507-da3b142c6e3d?w=500"
-      },
-      {
-        name: "Ola SUV",
-        price: "₹430",
-        rating: 4.4,
-        features: ["SUV", "6 seats", "AC", "Spacious"],
-        image: "https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?w=500"
-      }
-    ]
+    link: "https://www.olacabs.com",
+    img: "https://mir-s3-cdn-cf.behance.net/projects/404/e90ff525429101.Y3JvcCw0MDUwMCwzMTcwMCwwLDA.png",
   },
   {
-    id: "rapido",
-    name: "Rapido",
-    logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8a/Rapido_logo.svg/2560px-Rapido_logo.svg.png",
-    apiEndpoint: "https://www.rapido.bike",
-    features: [
-      "Bike taxis",
-      "Quick pickup",
-      "Affordable rides",
-      "Easy booking"
-    ],
-    options: [
-      {
-        name: "Rapido Bike",
-        price: "₹100",
-        rating: 4.2,
-        features: ["Bike", "1 seat", "Quick"],
-        image: "https://images.unsplash.com/photo-1558981806-ec527fa84c39?w=500"
-      },
-      {
-        name: "Rapido Auto",
-        price: "₹150",
-        rating: 4.0,
-        features: ["Auto", "3 seats", "Economical"],
-        image: "https://images.unsplash.com/photo-1566576721346-d4a3b4eaeb55?w=500"
-      }
-    ]
-  }
-]
-
-const airlineServices = [
-  {
-    id: "indigo",
-    name: "IndiGo",
-    logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9f/IndiGo_Logo.svg/2560px-IndiGo_Logo.svg.png",
-    options: [
-      {
-        name: "Economy",
-        price: "₹3,500",
-        rating: 4.3,
-        features: ["Standard seat", "7kg hand baggage", "15kg check-in"],
-        image: "https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=500"
-      },
-      {
-        name: "Business",
-        price: "₹7,500",
-        rating: 4.6,
-        features: ["Premium seat", "12kg hand baggage", "25kg check-in", "Priority boarding"],
-        image: "https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=500"
-      }
-    ]
+    name: "Taxi",
+    link: "https://www.megacabs.com/",
+    img: "https://img.freepik.com/premium-vector/car-taxi-transport-images-with-ai-generated_545052-1033.jpg?semt=ais_hybrid&w=740",
   },
   {
-    id: "airindia",
-    name: "Air India",
-    logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/41/Air_India_Logo.svg/2560px-Air_India_Logo.svg.png",
-    options: [
-      {
-        name: "Economy",
-        price: "₹4,000",
-        rating: 4.2,
-        features: ["Standard seat", "7kg hand baggage", "15kg check-in"],
-        image: "https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=500"
-      },
-      {
-        name: "Business",
-        price: "₹8,000",
-        rating: 4.5,
-        features: ["Premium seat", "12kg hand baggage", "25kg check-in", "Priority boarding"],
-        image: "https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=500"
-      }
-    ]
-  }
-]
+    name: "Auto",
+    link: "https://www.rapido.bike/Home",
+    img: "https://cdn.bajajauto.com/-/media/bajaj-auto/new-webp/3-wheeler/savings_calculator_image_re_new.webp",
+  },
+  {
+    name: "Train",
+    link: "https://en.wikipedia.org/wiki/Auto_rickshaw",
+    img: "https://cdn.vectorstock.com/i/500p/07/59/train-vector-2470759.jpg",
+  },
+  {
+    name: "Travers",
+    link: "https://www.redbus.in/",
+    img: "https://jcbl.com/jcbl-images/products/school-bus/school-bus-front-1.jpg",
+  },
+  {
+    name: "Aeroplane",
+    link : "https://www.goindigo.in/",
+    img: "https://t4.ftcdn.net/jpg/06/00/52/69/360_F_600526965_WfeE3qbs56WhV0pHBllWkzPnXAdfRAHK.jpg",
+  },
+];
 
-export default function TransportSection() {
-  const dispatch = useDispatch()
-  const { selectedTransportType } = useSelector((state) => state.transport)
-  const [fromLocation, setFromLocation] = useState("")
-  const [toLocation, setToLocation] = useState("")
-  const [searchClicked, setSearchClicked] = useState(false)
-  const [isLoading, setIsLoading] = useState(false)
-  const [error, setError] = useState(null)
-  const [priceComparison, setPriceComparison] = useState({})
-  const [showComparison, setShowComparison] = useState(false)
-  const [comparisonService, setComparisonService] = useState(null)
-  const [searchQuery, setSearchQuery] = useState("")
-
-  const handleSearch = async () => {
-    if (fromLocation && toLocation) {
-      setIsLoading(true)
-      setError(null)
-      setSearchClicked(true)
-
-      try {
-        const results = await Promise.all(
-          transportServices.map(async (service) => {
-            try {
-              const response = await fetch(`${service.apiEndpoint}?from=${encodeURIComponent(fromLocation)}&to=${encodeURIComponent(toLocation)}`)
-              if (!response.ok) throw new Error(`Failed to fetch from ${service.name}`)
-              const data = await response.json()
-              return { [service.id]: data }
-            } catch (error) {
-              console.error(`Error fetching from ${service.name}:`, error)
-              return { [service.id]: null }
-            }
-          })
-        )
-
-        const combinedResults = results.reduce((acc, curr) => ({ ...acc, ...curr }), {})
-        setPriceComparison(combinedResults)
-      } catch (error) {
-        setError("Failed to fetch price comparison")
-        console.error("Search error:", error)
-      } finally {
-        setIsLoading(false)
-      }
-    }
-  }
-
-  const handleCompareClick = (service) => {
-    setComparisonService(service)
-    setShowComparison(true)
-  }
-
-  const filteredOptions = (service) => {
-    return service.options.filter(option =>
-      option.name.toLowerCase().includes(searchQuery.toLowerCase())
-    )
-  }
-
-  const renderPriceComparison = (service) => {
-    const data = priceComparison[service.id]
-    
-    if (isLoading) {
-      return (
-        <div className="flex items-center justify-center h-40">
-          <Loader2 className="h-8 w-8 animate-spin text-blue-500" />
-        </div>
-      )
-    }
-
-    if (error) {
-      return (
-        <div className="text-red-500 text-center p-4">
-          Failed to load price comparison
-        </div>
-      )
-    }
-
-    if (!data) {
-      return (
-        <div className="text-gray-500 text-center p-4">
-          No price data available
-        </div>
-      )
-    }
-
-    return (
-      <div className="space-y-4">
-        <div className="flex items-center justify-between">
-          <span className="text-sm text-gray-500">Estimated Time</span>
-          <div className="flex items-center">
-            <Clock className="h-4 w-4 text-gray-500 mr-1" />
-            <span className="font-medium">{data.estimatedTime}</span>
-          </div>
-        </div>
-
-        <div className="flex items-center justify-between">
-          <span className="text-sm text-gray-500">Estimated Cost</span>
-          <div className="flex items-center">
-            <DollarSign className="h-4 w-4 text-gray-500 mr-1" />
-            <span className="font-medium">{data.estimatedCost}</span>
-          </div>
-        </div>
-
-        {data.availableOptions && (
-          <div className="space-y-2">
-            <h4 className="font-medium text-sm">Available Options</h4>
-            {data.availableOptions.map((option, index) => (
-              <div key={index} className="flex items-center justify-between text-sm">
-                <span>{option.name}</span>
-                <span className="font-medium">{option.price}</span>
-              </div>
-            ))}
-          </div>
-        )}
-
-        {data.surgeMultiplier && (
-          <div className="text-orange-500 text-sm">
-            Surge pricing: {data.surgeMultiplier}x
-          </div>
-        )}
-      </div>
-    )
-  }
-
+const TransportSection = () => {
   return (
-    <div className="py-8">
-      <h2 className="text-3xl font-bold text-center mb-8">Transport Services</h2>
+    <Container>
+      {/* Navbar 
+      <Navbar>
+        <Logo>TransportHub</Logo>
+        <NavLinks>
+          <NavLink href="#">Home</NavLink>
+          <NavLink href="#about">About</NavLink>
+          <NavLink href="#">Contact</NavLink>
+          <NavLink href="#">My Order</NavLink>
+        </NavLinks>
+      </Navbar>
+      */}
 
-      {/* Transport Type Selection */}
-      <div className="mb-8">
-        <h3 className="text-lg font-medium mb-4">Select Transport Type</h3>
-        <div className="flex flex-wrap gap-4">
-          {transportTypes.map((type) => {
-            const Icon = type.icon
-            return (
-              <Button
-                key={type.id}
-                variant={selectedTransportType === type.id ? "default" : "outline"}
-                className={`flex items-center gap-2 ${
-                  selectedTransportType === type.id ? "bg-blue-500 hover:bg-blue-600" : ""
-                }`}
-                onClick={() => dispatch(selectTransportType(type.id))}
-              >
-                <Icon className="h-4 w-4" />
-                {type.name}
-              </Button>
-            )
-          })}
-        </div>
-      </div>
+      {/* Categories Section */}
+      <Categories>
+        {categories.map((cat, index) => (
+          <Category key={index} onClick={() => window.open(cat.link, "_blank")}>
+            <CategoryImage src={cat.img} alt={cat.name} />
+            <CategoryText>{cat.name}</CategoryText>
+          </Category>
+        ))}
+      </Categories>
 
-      {/* Location Search */}
-      <Card className="mb-8">
-        <CardContent className="pt-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="space-y-2">
-              <Label htmlFor="from">From</Label>
-              <Input
-                id="from"
-                placeholder="Enter pickup location"
-                value={fromLocation}
-                onChange={(e) => setFromLocation(e.target.value)}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="to">To</Label>
-              <Input
-                id="to"
-                placeholder="Enter destination"
-                value={toLocation}
-                onChange={(e) => setToLocation(e.target.value)}
-              />
-            </div>
-          </div>
-          <Button
-            className="w-full mt-6 bg-blue-500 hover:bg-blue-600"
-            onClick={handleSearch}
-            disabled={!fromLocation || !toLocation || isLoading}
-          >
-            {isLoading ? (
-              <div className="flex items-center gap-2">
-                <Loader2 className="h-4 w-4 animate-spin" />
-                Searching...
-              </div>
-            ) : (
-              "Search Rides"
-            )}
-          </Button>
-        </CardContent>
-      </Card>
+      {/* Banner or Travel Image */}
+      <TravelBanner>
+        <TravelBannerImage
+          src="https://media.licdn.com/dms/image/v2/D4D12AQFXTaupu9r60w/article-cover_image-shrink_720_1280/article-cover_image-shrink_720_1280/0/1727262158206?e=2147483647&v=beta&t=LMgUVhl_PJOYLC023oJRh_92XphmcZ1-mUUMLviC0eU"
+          alt="Travel"
+        />
+        <BannerText>Explore the Best Travel Deals!</BannerText>
+      </TravelBanner>
 
-      {/* Transport Services */}
-      {searchClicked && (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {transportServices.map((service) => (
-            <Card key={service.id} className="overflow-hidden">
-              <CardHeader className="bg-gray-50 pb-3">
-                <div className="flex justify-between items-center">
-                  <CardTitle className="text-lg">{service.name}</CardTitle>
-                  <img
-                    src={service.logo}
-                    alt={`${service.name} logo`}
-                    className="h-10 w-10 object-contain"
-                  />
-                </div>
-              </CardHeader>
-              <CardContent className="pt-4">
-                <div className="space-y-4">
-                  {renderPriceComparison(service)}
+      {/* Trending Deals Section */}
+      <SectionTitle>Trending Transport Deals</SectionTitle>
+      <CardsContainer>
+        {tickets.map((ticket, index) => (
+          <Card key={index}>
+            <CardImage src={ticket.img} alt={ticket.type} />
+            <CardTitle>{ticket.type} Ticket</CardTitle>
+            <CardDetails>
+              <strong>Destination:</strong> {ticket.destination}
+            </CardDetails>
+            <CardDetails>
+              <strong>Price:</strong> {ticket.price}
+            </CardDetails>
+            <CardDetails>
+              <strong>Time:</strong> {ticket.time}
+            </CardDetails>
+            <BookButton>Book Now</BookButton>
+          </Card>
+        ))}
+      </CardsContainer>
 
-                  <ul className="space-y-2">
-                    {service.features.map((feature, index) => (
-                      <li key={index} className="flex items-center gap-2 text-sm text-gray-600">
-                        <Car className="h-4 w-4 text-blue-500" />
-                        {feature}
-                      </li>
-                    ))}
-                  </ul>
+      {/* About Section */}
+      <AboutSection id="about">
+        <AboutTitle>About TransportHub</AboutTitle>
+        <AboutText>
+          TransportHub is your all-in-one platform to book and explore
+          transportation options including buses, trains, flights, taxis, and
+          autos. With direct access to top platforms like Uber, Ola, RedBus, and
+          more – your journey begins here with convenience and speed.
+        </AboutText>
+      </AboutSection>
+    </Container>
+  );
+};
 
-                  <button
-                    className="block w-full text-center bg-blue-500 text-white py-2 rounded-md hover:bg-blue-600 transition-colors"
-                    onClick={() => handleCompareClick(service)}
-                  >
-                    Compare Options
-                  </button>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      )}
+export default TransportSection;
 
-      {/* Comparison Modal */}
-      {showComparison && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-lg p-6 max-w-6xl w-full max-h-[90vh] overflow-y-auto">
-            <div className="flex justify-between items-center mb-6">
-              <h3 className="text-2xl font-bold">Compare Transport Options</h3>
-              <button
-                onClick={() => setShowComparison(false)}
-                className="text-gray-500 hover:text-gray-700"
-              >
-                <X className="h-6 w-6" />
-              </button>
-            </div>
+// Styled Components for CSS
 
-            {/* Search Bar */}
-            <div className="mb-6">
-              <div className="relative">
-                <Input
-                  type="text"
-                  placeholder="Search transport options..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-10"
-                />
-                <Search className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
-              </div>
-            </div>
+const Container = styled.div`
+  width: 100%;
+  overflow-x: hidden;
+  font-family: Arial, sans-serif;
+`;
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {selectedTransportType === "plane" ? (
-                airlineServices.map((service) => (
-                  <div key={service.id} className="space-y-4">
-                    <div className="flex items-center gap-2 mb-4">
-                      <img
-                        src={service.logo}
-                        alt={`${service.name} logo`}
-                        className="h-8 object-contain"
-                      />
-                      <h4 className="font-semibold text-lg">{service.name}</h4>
-                    </div>
+const Navbar = styled.nav`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #2c3e50;
+  padding: 20px 80px;
+  color: white;
+  box-sizing: border-box;
+`;
 
-                    <div className="space-y-4">
-                      {filteredOptions(service).map((option) => (
-                        <div key={option.name} className="bg-gray-50 p-4 rounded-lg">
-                          <img
-                            src={option.image}
-                            alt={option.name}
-                            className="w-full h-40 object-cover rounded-lg mb-3"
-                          />
-                          <h5 className="font-medium">{option.name}</h5>
-                          <div className="flex items-center justify-between mt-2">
-                            <div className="flex items-center gap-1">
-                              <Star className="h-4 w-4 text-yellow-400" />
-                              <span className="text-sm">{option.rating}</span>
-                            </div>
-                            <span className="font-medium">{option.price}</span>
-                          </div>
-                          <ul className="mt-2 space-y-1">
-                            {option.features.map((feature, index) => (
-                              <li key={index} className="text-sm text-gray-600">
-                                • {feature}
-                              </li>
-                            ))}
-                          </ul>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                ))
-              ) : (
-                transportServices.map((service) => (
-                  <div key={service.id} className="space-y-4">
-                    <div className="flex items-center gap-2 mb-4">
-                      <img
-                        src={service.logo}
-                        alt={`${service.name} logo`}
-                        className="h-8 object-contain"
-                      />
-                      <h4 className="font-semibold text-lg">{service.name}</h4>
-                    </div>
+const Logo = styled.div`
+  font-size: 24px;
+  font-weight: bold;
+`;
 
-                    <div className="space-y-4">
-                      {filteredOptions(service).map((option) => (
-                        <div key={option.name} className="bg-gray-50 p-4 rounded-lg">
-                          <img
-                            src={option.image}
-                            alt={option.name}
-                            className="w-full h-40 object-cover rounded-lg mb-3"
-                          />
-                          <h5 className="font-medium">{option.name}</h5>
-                          <div className="flex items-center justify-between mt-2">
-                            <div className="flex items-center gap-1">
-                              <Star className="h-4 w-4 text-yellow-400" />
-                              <span className="text-sm">{option.rating}</span>
-                            </div>
-                            <span className="font-medium">{option.price}</span>
-                          </div>
-                          <ul className="mt-2 space-y-1">
-                            {option.features.map((feature, index) => (
-                              <li key={index} className="text-sm text-gray-600">
-                                • {feature}
-                              </li>
-                            ))}
-                          </ul>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                ))
-              )}
-            </div>
+const NavLinks = styled.div`
+  display: flex;
+`;
 
-            <div className="mt-6 flex justify-end gap-4">
-              <button
-                onClick={() => setShowComparison(false)}
-                className="px-4 py-2 text-gray-600 hover:text-gray-800"
-              >
-                Close
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-    </div>
-  )
-}
+const NavLink = styled.a`
+  color: white;
+  text-decoration: none;
+  margin-left: 40px;
+  font-weight: bold;
+  transition: color 0.3s ease;
+
+  &:hover {
+    color: #f1c40f;
+  }
+`;
+
+const Categories = styled.div`
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 20px;
+  padding: 30px 20px;
+  background-color: #ffffff;
+`;
+
+const Category = styled.div`
+  width: 120px;
+  text-align: center;
+  cursor: pointer;
+`;
+
+const CategoryImage = styled.img`
+  width: 80px;
+  height: 80px;
+  object-fit: contain;
+  margin-bottom: 10px;
+  transition: transform 0.3s;
+`;
+
+const CategoryText = styled.p`
+  font-weight: 600;
+`;
+
+const TravelBanner = styled.div`
+  position: relative;
+  text-align: center;
+  margin-top: 40px;
+`;
+
+const TravelBannerImage = styled.img`
+  width: 100%;
+  height: 400px;
+  object-fit: cover;
+`;
+
+const BannerText = styled.div`
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 36px;
+  font-weight: bold;
+  color: white;
+  text-shadow: 2px 2px 10px rgba(0, 0, 0, 0.6);
+`;
+
+const SectionTitle = styled.h2`
+  text-align: center;
+  margin-top: 40px;
+  font-size: 28px;
+  color: #2c3e50;
+`;
+
+const CardsContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 20px;
+  padding: 20px;
+`;
+
+const Card = styled.div`
+  background: #fff;
+  width: 250px;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  text-align: center;
+  padding: 15px;
+`;
+
+const CardImage = styled.img`
+  width: 100%;
+  height: 150px;
+  object-fit: cover;
+`;
+
+const CardTitle = styled.h3`
+  margin: 10px 0;
+  color: #333;
+`;
+
+const CardDetails = styled.p`
+  font-size: 14px;
+  color: #555;
+`;
+
+const BookButton = styled.button`
+  background-color: #3498db;
+  border: none;
+  color: white;
+  padding: 10px 15px;
+  border-radius: 8px;
+  margin-top: 10px;
+  cursor: pointer;
+`;
+
+const AboutSection = styled.div`
+  background-color: #ffffff;
+  padding: 40px 20px;
+  text-align: center;
+`;
+
+const AboutTitle = styled.h2`
+  font-size: 28px;
+  margin-bottom: 20px;
+  color: #2c3e50;
+`;
+
+const AboutText = styled.p`
+  max-width: 700px;
+  margin: 0 auto;
+  color: #555;
+  font-size: 16px;
+`;
