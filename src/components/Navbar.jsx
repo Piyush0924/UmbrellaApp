@@ -5,7 +5,7 @@ import { Button } from "./ui/button"
 
 export default function Navbar({ activeSection, setActiveSection }) {
   return (
-    <nav className="bg-black shadow-md">
+    <nav className="bg-red shadow-md">
       
       <div className="container mx-auto px-4">
         <div className="flex justify-between items-center h-16">
