@@ -6,6 +6,10 @@ import { Button } from "./ui/button"
 export default function Navbar({ activeSection, setActiveSection }) {
   return (
     <nav className="bg-red shadow-md">
+<<<<<<< HEAD
+=======
+      
+>>>>>>> 3b9f2ceecb6e5baa6577ffe5082bc43ad4910457
       <div className="container mx-auto px-4">
         <div className="flex justify-between items-center h-16">
           <div className="flex-shrink-0">
