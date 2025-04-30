@@ -170,9 +170,11 @@ const NavLink = styled.a`
   transition: color 0.3s ease;
 
   &:hover {
-    color:rgb(15, 56, 241);
+    color:rgb(125, 202, 238);
   }
 `;
+
+import styled from 'styled-components';
 
 const Categories = styled.div`
   display: flex;
@@ -182,6 +184,7 @@ const Categories = styled.div`
   padding: 30px 20px;
   background-color: #ffffff;
 `;
+
 
 const Category = styled.div`
   width: 120px;
