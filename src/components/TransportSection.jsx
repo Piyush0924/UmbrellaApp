@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import styled from "styled-components";
 
 // Tickets and Categories Data
@@ -16,6 +16,41 @@ const tickets = [
     price: "₹499",
     time: "10:30 AM",
     img: "https://picsum.photos/200?train",
+  },
+  {
+    type: "Flight",
+    destination: "Bangalore to Goa",
+    price: "₹3499",
+    time: "1:00 PM",
+    img: "https://picsum.photos/200?flight",
+  },
+  {
+    type: "metro",
+    destination: "Bangalore to Goa",
+    price: "₹3499",
+    time: "1:00 PM",
+    img: "https://picsum.photos/200?flight",
+  },
+  {
+    type: "pattna",
+    destination: "Bangalore to Goa",
+    price: "₹3499",
+    time: "1:00 PM",
+    img: "https://picsum.photos/200?flight",
+  },
+  {
+    type: "mumbai",
+    destination: "mumbai to Goa",
+    price: "₹3499",
+    time: "1:00 PM",
+    img: "https://picsum.photos/200?flight",
+  },
+  {
+    type: "Flight",
+    destination: "Bangalore to Goa",
+    price: "₹3499",
+    time: "1:00 PM",
+    img: "https://picsum.photos/200?flight",
   },
   {
     type: "Flight",
@@ -59,26 +94,15 @@ const categories = [
   },
   {
     name: "Aeroplane",
-    link : "https://www.goindigo.in/",
+    link: "https://www.goindigo.in/",
     img: "https://t4.ftcdn.net/jpg/06/00/52/69/360_F_600526965_WfeE3qbs56WhV0pHBllWkzPnXAdfRAHK.jpg",
   },
+ 
 ];
 
 const TransportSection = () => {
   return (
     <Container>
-      {/* Navbar 
-      <Navbar>
-        <Logo>TransportHub</Logo>
-        <NavLinks>
-          <NavLink href="#">Home</NavLink>
-          <NavLink href="#about">About</NavLink>
-          <NavLink href="#">Contact</NavLink>
-          <NavLink href="#">My Order</NavLink>
-        </NavLinks>
-      </Navbar>
-      */}
-
       {/* Categories Section */}
       <Categories>
         {categories.map((cat, index) => (
@@ -89,7 +113,7 @@ const TransportSection = () => {
         ))}
       </Categories>
 
-      {/* Banner or Travel Image */}
+      {/* Travel Banner */}
       <TravelBanner>
         <TravelBannerImage
           src="https://media.licdn.com/dms/image/v2/D4D12AQFXTaupu9r60w/article-cover_image-shrink_720_1280/article-cover_image-shrink_720_1280/0/1727262158206?e=2147483647&v=beta&t=LMgUVhl_PJOYLC023oJRh_92XphmcZ1-mUUMLviC0eU"
@@ -98,7 +122,13 @@ const TransportSection = () => {
         <BannerText>Explore the Best Travel Deals!</BannerText>
       </TravelBanner>
 
-      {/* Trending Deals Section */}
+      {/* Search Bar */}
+      <SearchBar>
+        <SearchInput type="text" placeholder="Search for transport..." />
+        <SearchIcon>🔍</SearchIcon>
+      </SearchBar>
+
+      {/* Ticket Deals */}
       <SectionTitle>Trending Transport Deals</SectionTitle>
       <CardsContainer>
         {tickets.map((ticket, index) => (
@@ -119,62 +149,44 @@ const TransportSection = () => {
         ))}
       </CardsContainer>
 
-      {/* About Section */}
-      <AboutSection id="about">
-        <AboutTitle>About TransportHub</AboutTitle>
-        <AboutText>
-          TransportHub is your all-in-one platform to book and explore
-          transportation options including buses, trains, flights, taxis, and
-          autos. With direct access to top platforms like Uber, Ola, RedBus, and
-          more – your journey begins here with convenience and speed.
-        </AboutText>
-      </AboutSection>
+      {/* FAQ Section */}
+      <FAQSection id="faq">
+        <FAQTitle>FAQ</FAQTitle>
+        <FAQItem>
+          <Question onClick={() => toggleAnswer(0)}>1. How can I book a ticket?</Question>
+          <Answer id="answer0">You can book a ticket by selecting your preferred transport option (bus, train, or flight) on our website, choosing your destination, and clicking the "Book Now" button. You will be prompted to enter your payment details and complete the booking process.</Answer>
+        </FAQItem>
+        <FAQItem>
+          <Question onClick={() => toggleAnswer(1)}>2. Are there any discounts available?</Question>
+          <Answer id="answer1">Yes, we offer various discounts from time to time. You can check our homepage or subscribe to our newsletter for updates on available discounts. Additionally, we offer special deals for group bookings and festive seasons.</Answer>
+        </FAQItem>
+        <FAQItem>
+          <Question onClick={() => toggleAnswer(2)}>3. Can I cancel my booking?</Question>
+          <Answer id="answer2">Yes, you can cancel your booking. Depending on the transport service, cancellation policies may vary. Generally, you can cancel your ticket up to 24 hours before departure to receive a full refund. Please check the cancellation policy on the booking page for more details.</Answer>
+        </FAQItem>
+        <FAQItem>
+          <Question onClick={() => toggleAnswer(3)}>4. Do I need an account to book tickets?</Question>
+          <Answer id="answer3">No, you do not need an account to book tickets. You can book tickets as a guest. However, creating an account allows you to track your bookings, receive special offers, and access faster checkout for future bookings.</Answer>
+        </FAQItem>
+      </FAQSection>
     </Container>
   );
 };
 
+// Toggle answer visibility
+const toggleAnswer = (index) => {
+  const answer = document.getElementById(`answer${index}`);
+  answer.style.display = answer.style.display === "block" ? "none" : "block";
+};
+
 export default TransportSection;
 
-// Styled Components for CSS
-
+// Styled Components
 const Container = styled.div`
   width: 100%;
   overflow-x: hidden;
   font-family: Arial, sans-serif;
 `;
-
-const Navbar = styled.nav`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background-color: #2c3e50;
-  padding: 20px 80px;
-  color: white;
-  box-sizing: border-box;
-`;
-
-const Logo = styled.div`
-  font-size: 24px;
-  font-weight: bold;
-`;
-
-const NavLinks = styled.div`
-  display: flex;
-`;
-
-const NavLink = styled.a`
-  color: white;
-  text-decoration: none;
-  margin-left: 40px;
-  font-weight: bold;
-  transition: color 0.3s ease;
-
-  &:hover {
-    color:rgb(125, 202, 238);
-  }
-`;
-
-import styled from 'styled-components';
 
 const Categories = styled.div`
   display: flex;
@@ -184,7 +196,6 @@ const Categories = styled.div`
   padding: 30px 20px;
   background-color: #ffffff;
 `;
-
 
 const Category = styled.div`
   width: 120px;
@@ -234,6 +245,35 @@ const SectionTitle = styled.h2`
   color: #2c3e50;
 `;
 
+const SearchBar = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 80%; /* Change this value to adjust the width */
+  max-width: 600px;
+  margin: 5% auto 20px;
+  padding: 10px;
+  background-color: #fff;
+  border-radius: 25px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+`;
+
+const SearchInput = styled.input`
+  flex: 1;
+  border: none;
+  padding: 8px 12px;
+  font-size: 16px;
+  border-radius: 20px;
+  outline: none;
+  background-color: #f1f1f1;
+`;
+
+const SearchIcon = styled.span`
+  width: 24px;
+  height: 24px;
+  cursor: pointer;
+`;
+
 const CardsContainer = styled.div`
   display: flex;
   justify-content: center;
@@ -278,21 +318,42 @@ const BookButton = styled.button`
   cursor: pointer;
 `;
 
-const AboutSection = styled.div`
+// FAQ Styled Components
+const FAQSection = styled.div`
   background-color: #ffffff;
   padding: 40px 20px;
-  text-align: center;
-`;
-
-const AboutTitle = styled.h2`
-  font-size: 28px;
-  margin-bottom: 20px;
-  color: #2c3e50;
-`;
-
-const AboutText = styled.p`
-  max-width: 700px;
+  text-align: left;
+  max-width: 900px;
   margin: 0 auto;
-  color: #555;
-  font-size: 16px;
 `;
+
+const FAQTitle = styled.h2`
+  text-align: center;
+  font-size: 28px;
+  color: #2c3e50;
+  margin-bottom: 30px;
+`;
+
+const FAQItem = styled.div`
+  margin-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+`;
+
+const Question = styled.h4`
+  font-size: 18px;
+  color: #34495e;
+  cursor: pointer;
+  transition: color 0.3s;
+  &:hover {
+    color: #3498db;
+  }
+`;
+
+const Answer = styled.p`
+  font-size: 16px;
+  color: #555;
+  margin-left: 10px;
+  display: none;
+`;
+
